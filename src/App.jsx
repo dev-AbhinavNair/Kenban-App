@@ -114,7 +114,7 @@ function App() {
     <>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         <section className="py-8 px-4">
-          <form className="max-w-2xl mx-auto">
+          <form className="max-w-2xl mx-auto" onSubmit={(e) => e.preventDefault()}>
             <h1 className="mb-10 text-center text-5xl md:text-6xl font-extrabold tracking-wide text-white">
               <span className="bg-gradient-to-r from-teal-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">
                 Kenban App
