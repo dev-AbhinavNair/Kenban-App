@@ -5,6 +5,7 @@ function App() {
   const [columns, setColumns] = useState({
     todo: {
       name: "To Do",
+      icon: "ri-todo-line text-xl text-white",
       items: [
         { id: "1", content: "Market research" },
         { id: "2", content: "Write Projects" },
@@ -13,11 +14,13 @@ function App() {
 
     inProgress: {
       name: "In Progress",
+      icon: "ri-time-line text-xl text-white",
       items: [{ id: "3", content: "Desing UI mockups" }],
     },
 
     done: {
       name: "Done",
+      icon: "ri-checkbox-circle-line text-xl text-white",
       items: [{ id: "4", content: "Set up repository" }],
     },
   });
@@ -27,7 +30,7 @@ function App() {
   const [draggedItem, setDraggedItem] = useState(null);
 
   const addNewTask = () => {
-    if (newTask.trim === "") return;
+    if (newTask.trim() === "") return;
 
     const updatedColumns = { ...columns };
 
@@ -111,13 +114,10 @@ function App() {
                   </option>
                 ))}
 
-                {/* <option value="todo">Todo</option>
-                <option value="inprogress">In Progress</option>
-                <option value="completed">Completed</option> */}
               </select>
 
               <button
-                type="submit"
+                type="button"
                 className="w-full sm:w-auto px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
                 onClick={addNewTask}
               >
@@ -130,46 +130,68 @@ function App() {
 
         <div className="px-4 py-8">
           <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* COLUMN */}
+            {Object.entries(columns).map(([columnId, column]) => (
+              <section
+                key={columnId}
+                className="min-w-[300px]"
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, columnId)}
+              >
+                <div className="bg-gray-800/50 rounded-xl p-6 h-full border border-gray-700">
 
-            <section className="min-w-[300px]">
-              <div className="bg-gray-800/50 rounded-xl p-6 h-full border border-gray-700">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-blue-600">
-                      <i className="ri-todo-line text-xl text-white"></i>
-                    </div>
-                    <h2 className="text-xl font-semibold text-white">Todo</h2>
-                  </div>
-                  <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-sm">
-                    2
-                  </span>
-                </div>
-
-                <div className="min-h-[400px] space-y-3">
-                  <div
-                    tabIndex={0}
-                    role="button"
-                    className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-gray-600 transition cursor-grab active:cursor-grabbing"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="flex-1 text-white text-sm">
-                        Design new landing page
-                      </span>
-
-                      <div className="flex gap-2">
-                        <button className="w-8 h-8 bg-gray-700 hover:bg-gray-600 text-teal-400 rounded">
-                          <i className="ri-edit-line"></i>
-                        </button>
-                        <button className="w-8 h-8 bg-gray-700 hover:bg-red-600 text-red-400 hover:text-white rounded">
-                          <i className="ri-delete-bin-line"></i>
-                        </button>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-blue-600">
+                        <i className={column.icon}></i>
                       </div>
+                      <h2 className="text-xl font-semibold text-white">
+                        {column.name}
+                      </h2>
                     </div>
+
+                    <span className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-sm">
+                      {column.items.length}
+                    </span>
+                  </div>
+
+                  
+                  <div className="min-h-[400px] space-y-3">
+                    {column.items.length === 0 ? (
+                      <p className="text-center text-gray-500 italic text-sm">
+                        Drop tasks here
+                      </p>
+                    ) : (
+                      column.items.map((item) => (
+                        <div
+                          key={item.id}
+                          draggable
+                          onDragStart={() => handleDragStart(columnId, item)}
+                          className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-gray-600 transition cursor-grab active:cursor-grabbing"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="flex-1 text-white text-sm">
+                              {item.content}
+                            </span>
+
+                            <div className="flex gap-2">
+                              <button className="w-8 h-8 bg-gray-700 hover:bg-gray-600 text-teal-400 rounded">
+                                <i className="ri-edit-line"></i>
+                              </button>
+                              <button
+                                onClick={() => removeTask(columnId, item.id)}
+                                className="w-8 h-8 bg-gray-700 hover:bg-red-600 text-red-400 hover:text-white rounded"
+                              >
+                                <i className="ri-delete-bin-line"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
-              </div>
-            </section>
+              </section>
+            ))}
           </div>
         </div>
       </div>
