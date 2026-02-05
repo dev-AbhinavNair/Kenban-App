@@ -6,6 +6,7 @@ function App() {
     todo: {
       name: "To Do",
       icon: "ri-todo-line text-xl text-white",
+      color: "w-10 h-10 flex items-center justify-center rounded-lg  bg-blue-600",
       items: [
         { id: "1", content: "Market research" },
         { id: "2", content: "Write Projects" },
@@ -15,12 +16,14 @@ function App() {
     inProgress: {
       name: "In Progress",
       icon: "ri-time-line text-xl text-white",
+      color: "w-10 h-10 flex items-center justify-center rounded-lg  bg-amber-600",
       items: [{ id: "3", content: "Desing UI mockups" }],
     },
 
     done: {
       name: "Done",
       icon: "ri-checkbox-circle-line text-xl text-white",
+      color: "w-10 h-10 flex items-center justify-center rounded-lg bg-teal-600",
       items: [{ id: "4", content: "Set up repository" }],
     },
   });
@@ -141,7 +144,7 @@ function App() {
 
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-blue-600">
+                      <div className={column.color}>
                         <i className={column.icon}></i>
                       </div>
                       <h2 className="text-xl font-semibold text-white">
