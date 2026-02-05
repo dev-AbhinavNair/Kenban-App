@@ -31,6 +31,7 @@ function App() {
   const [newTask, setNewTask] = useState("");
   const [activeColumns, setActiveColumns] = useState("todo");
   const [draggedItem, setDraggedItem] = useState(null);
+  const [editingTask, setEditingTask] = useState({ columnId: null, taskId: null, content: "" });
 
   const addNewTask = () => {
     if (newTask.trim() === "") return;
@@ -54,6 +55,30 @@ function App() {
     );
 
     setColumns(updatedColumns);
+  };
+
+  const startEditingTask = (columnId, taskId, content) => {
+    setEditingTask({ columnId, taskId, content });
+  };
+
+  const updateTask = () => {
+    if (editingTask.content.trim() === "") return;
+
+    const updatedColumns = { ...columns };
+    const taskIndex = updatedColumns[editingTask.columnId].items.findIndex(
+      (item) => item.id === editingTask.taskId
+    );
+
+    if (taskIndex !== -1) {
+      updatedColumns[editingTask.columnId].items[taskIndex].content = editingTask.content;
+      setColumns(updatedColumns);
+    }
+
+    setEditingTask({ columnId: null, taskId: null, content: "" });
+  };
+
+  const cancelEditing = () => {
+    setEditingTask({ columnId: null, taskId: null, content: "" });
   };
 
   const handleDragStart = (columnId, item) => {
@@ -104,6 +129,7 @@ function App() {
                 value={newTask}
                 onChange={(e) => setNewTask(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && addNewTask()}
+                
               />
 
               <select
@@ -164,32 +190,72 @@ function App() {
                         Drop tasks here
                       </p>
                     ) : (
-                      column.items.map((item) => (
-                        <div
-                          key={item.id}
-                          draggable
-                          onDragStart={() => handleDragStart(columnId, item)}
-                          className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-gray-600 transition cursor-grab active:cursor-grabbing"
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="flex-1 text-white text-sm">
-                              {item.content}
-                            </span>
+                       column.items.map((item) => {
+                         const isEditing = editingTask.columnId === columnId && editingTask.taskId === item.id;
+                         
+                         return (
+                           <div
+                             key={item.id}
+                             draggable
+                             onDragStart={() => handleDragStart(columnId, item)}
+                             className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-gray-600 transition cursor-grab active:cursor-grabbing"
+                           >
+                             <div className="flex items-center justify-between gap-3">
+                               {isEditing ? (
+                                 <input
+                                   type="text"
+                                   value={editingTask.content}
+                                   onChange={(e) => setEditingTask({ ...editingTask, content: e.target.value })}
+                                   onKeyDown={(e) => {
+                                     if (e.key === "Enter") updateTask();
+                                     if (e.key === "Escape") cancelEditing();
+                                   }}
+                                   className="flex-1 px-2 py-1 bg-gray-700 text-white border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm"
+                                   autoFocus
+                                 />
+                               ) : (
+                                 <span className="flex-1 text-white text-sm">
+                                   {item.content}
+                                 </span>
+                               )}
 
-                            <div className="flex gap-2">
-                              <button className="w-8 h-8 bg-gray-700 hover:bg-gray-600 text-teal-400 rounded">
-                                <i className="ri-edit-line"></i>
-                              </button>
-                              <button
-                                onClick={() => removeTask(columnId, item.id)}
-                                className="w-8 h-8 bg-gray-700 hover:bg-red-600 text-red-400 hover:text-white rounded"
-                              >
-                                <i className="ri-delete-bin-line"></i>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))
+                               <div className="flex gap-2">
+                                 {isEditing ? (
+                                   <>
+                                     <button
+                                       onClick={updateTask}
+                                       className="w-8 h-8 bg-green-600 hover:bg-green-700 text-white rounded"
+                                     >
+                                       <i className="ri-check-line"></i>
+                                     </button>
+                                     <button
+                                       onClick={cancelEditing}
+                                       className="w-8 h-8 bg-gray-600 hover:bg-gray-700 text-white rounded"
+                                     >
+                                       <i className="ri-close-line"></i>
+                                     </button>
+                                   </>
+                                 ) : (
+                                   <>
+                                     <button 
+                                       onClick={() => startEditingTask(columnId, item.id, item.content)}
+                                       className="w-8 h-8 bg-gray-700 hover:bg-gray-600 text-teal-400 rounded"
+                                     >
+                                       <i className="ri-edit-line"></i>
+                                     </button>
+                                     <button
+                                       onClick={() => removeTask(columnId, item.id)}
+                                       className="w-8 h-8 bg-gray-700 hover:bg-red-600 text-red-400 hover:text-white rounded"
+                                     >
+                                       <i className="ri-delete-bin-line"></i>
+                                     </button>
+                                   </>
+                                 )}
+                               </div>
+                             </div>
+                           </div>
+                         );
+                       })
                     )}
                   </div>
                 </div>
