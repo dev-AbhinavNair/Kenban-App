@@ -1,9 +1,12 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
-  const [columns, setColumns] = useState({
-    todo: {
+  const [columns, setColumns] = useState(() => {
+    const saved = localStorage.getItem("kenban-data");
+
+    return saved ? JSON.parse(saved) : {
+      todo: {
       name: "To Do",
       icon: "ri-todo-line text-xl text-white",
       color: "w-10 h-10 flex items-center justify-center rounded-lg  bg-blue-600",
@@ -26,6 +29,7 @@ function App() {
       color: "w-10 h-10 flex items-center justify-center rounded-lg bg-teal-600",
       items: [{ id: "4", content: "Set up repository" }],
     },
+    }
   });
 
   const [newTask, setNewTask] = useState("");
@@ -109,6 +113,10 @@ function App() {
     setColumns(updatedColumns);
     setDraggedItem(null);
   };
+
+  useEffect(() => {
+    localStorage.setItem("kenban-data", JSON.stringify(columns));
+  }, [columns])
 
   return (
     <>
