@@ -93,6 +93,18 @@ function App() {
     e.preventDefault();
   };
 
+  const getTaskGlowClass = (columnId, isDragging) => {
+    const glowColors = {
+      todo: "shadow-[0_0_8px_rgba(59,130,246,0.12)] hover:shadow-[0_0_12px_rgba(59,130,246,0.20)]",
+      inProgress: "shadow-[0_0_8px_rgba(245,158,11,0.12)] hover:shadow-[0_0_12px_rgba(245,158,11,0.20)]",
+      done: "shadow-[0_0_8px_rgba(20,184,166,0.12)] hover:shadow-[0_0_12px_rgba(20,184,166,0.20)]"
+    };
+    
+    return isDragging 
+      ? 'shadow-[0_0_20px_rgba(20,184,166,0.3)] opacity-90' 
+      : glowColors[columnId];
+  };
+
   const handleDrop = (e, columnId) => {
     e.preventDefault();
 
@@ -133,15 +145,14 @@ function App() {
               <input
                 type="text"
                 placeholder="Enter task..."
-                className="flex-1 w-full sm:w-auto px-4 py-3 bg-gray-800 text-white border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm placeholder-gray-500"
+                className="flex-1 w-full sm:w-auto px-4 py-3 bg-gray-800 text-white border border-gray-700 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500 hover:shadow-[0_0_10px_rgba(20,184,166,0.2)] focus:shadow-[0_0_15px_rgba(20,184,166,0.3)]"
                 value={newTask}
                 onChange={(e) => setNewTask(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && addNewTask()}
-                
               />
 
               <select
-                className="w-full sm:w-auto px-4 py-3 bg-gray-800 text-white border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm cursor-pointer"
+                className="w-full sm:w-auto px-4 py-3 bg-gray-800 text-white border border-gray-700 rounded-lg text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500 hover:shadow-[0_0_10px_rgba(20,184,166,0.2)] focus:shadow-[0_0_15px_rgba(20,184,166,0.3)]"
                 value={activeColumns}
                 onChange={(e) => setActiveColumns(e.target.value)}
               >
@@ -174,7 +185,10 @@ function App() {
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, columnId)}
               >
-                <div className="bg-gray-800/50 rounded-xl p-6 h-full border border-gray-700">
+                <div className={`bg-gray-800/50 rounded-xl p-6 h-full border border-gray-700 
+                  ${columnId === 'todo' ? 'shadow-[0_0_15px_rgba(59,130,246,0.15)] hover:shadow-[0_0_25px_rgba(59,130,246,0.25)]' : 
+                    columnId === 'inProgress' ? 'shadow-[0_0_15px_rgba(245,158,11,0.15)] hover:shadow-[0_0_25px_rgba(245,158,11,0.25)]' : 
+                    'shadow-[0_0_15px_rgba(20,184,166,0.15)] hover:shadow-[0_0_25px_rgba(20,184,166,0.25)]'}`}>
 
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
@@ -202,12 +216,12 @@ function App() {
                          const isEditing = editingTask.columnId === columnId && editingTask.taskId === item.id;
                          
                          return (
-                           <div
-                             key={item.id}
-                             draggable
-                             onDragStart={() => handleDragStart(columnId, item)}
-                             className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-gray-600 transition cursor-grab active:cursor-grabbing"
-                           >
+                            <div
+                              key={item.id}
+                              draggable
+                              onDragStart={() => handleDragStart(columnId, item)}
+                              className={`bg-gray-800 border border-gray-700 rounded-lg p-4 cursor-grab active:cursor-grabbing ${getTaskGlowClass(columnId, draggedItem?.item?.id === item.id)}`}
+                            >
                              <div className="flex items-center justify-between gap-3">
                                {isEditing ? (
                                  <input
